@@ -1,7 +1,7 @@
 //  https://rapidapi.com/api-sports/api/api-basketball
-
 //  https://rapidapi.com/developer/dashboard
-let key = '10f0d3c959mshe5fca1f0098b852p17d5bajsncdeef06aead7';			//  rapid API
+
+let key = 'your key goes here';			//  rapid API
 
 /*
  *  The 'Get NBA Teams' button was pushed
