@@ -63,6 +63,7 @@ function showHomes(homes) {
     homeTable.innerHTML = html;
 }
 
+//  not used currently
 function getPropertyById() {
     fetch("https://realtor.p.rapidapi.com/properties/v2/detail?property_id=O3599084026", {
         "method": "GET",
@@ -71,7 +72,7 @@ function getPropertyById() {
             "x-rapidapi-host": "realtor.p.rapidapi.com"
         }
     })
-        .then(response => console.log(response))
         .then(response => response.json())
+        .then(response => console.log(response))
         .catch(err => console.error(err));
 }

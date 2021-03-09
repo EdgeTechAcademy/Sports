@@ -15,9 +15,7 @@ function getMLBTeams() {
     })
         .then(response => response.json()) //  wait for the response and convert it to JSON
         .then(teams => showTeams(teams.response, league, season))
-        .catch(err => {
-            console.error(err);
-        });
+        .catch(err => console.error(err));
 }
 
 function showTeams(teams, league, season) {
@@ -28,7 +26,6 @@ function showTeams(teams, league, season) {
     for (let team of teams) {
         if (team.logo.length == 0) team.logo = '/images/NBA-Logo.jpg';
         html += `
-			
 			<div class="col-xs-5 col-sm-3 col-md-2">
 				<img src='${team.logo}' height=50px width=50px onclick='getStats(${team.id},${league},${season})'>
 				<br>
@@ -43,7 +40,7 @@ function getStats(id, league, season) {
         "method": "GET",
             "headers": {
             "x-rapidapi-key": key,
-                "x-rapidapi-host": "api-baseball.p.rapidapi.com"
+            "x-rapidapi-host": "api-baseball.p.rapidapi.com"
         }
     })
         .then(response => response.json()) //  wait for the response and convert it to JSON
@@ -51,6 +48,10 @@ function getStats(id, league, season) {
         .catch(err => console.error(err));
 }
 
+/*
+ *      show the home, away and total stats for the selected team
+ *
+ */
 function showStats(teamStats) {
     let teamTable = document.getElementById('team');
     let games = teamStats.response.games;

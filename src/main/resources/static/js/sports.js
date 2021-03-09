@@ -11,6 +11,7 @@ let key = '10f0d3c959mshe5fca1f0098b852p17d5bajsncdeef06aead7';			//  rapid API
  *      team logo and get their list of games and player roster
  */
 function getNBATeams() {
+    //  the user has entered a conference into the entry field -- east, west, utah, sacromento
     let conference = document.getElementById('conference').value;
 
     fetch(`https://api-nba-v1.p.rapidapi.com/teams/confName/${conference}`, {
@@ -21,7 +22,7 @@ function getNBATeams() {
         }
     })
         .then(response => response.json())
-        .then(teams => showNBATeams(teams.api.teams))
+        .then(teams => showNBATeams(teams.api.teams))       //  this function will list all teams in the conference
         .catch(err => {
             console.error(err);
         });
@@ -49,7 +50,7 @@ function showNBATeams(teams) {
 
 /*
  *      Using the teamId call the two methods that will
- *      request the team roster and list of games for that team
+ *      request the team roster AND list of games for that team
  */
 function getGamesAndRoster(teamId) {
     getNBATeamRoster(teamId);
@@ -73,16 +74,6 @@ function getNBATeamRoster(teamId) {
         .catch(err => console.error(err));
 }
 
-/*
-          dP                      dP          .8888b          dP       oo oo dP       dP                                                                    dP
-          88                      88          88   "          88             88       88                                                                    88
- .d8888b. 88d888b. .d8888b. .d888b88 .d8888b. 88aaa  .d8888b. 88d888b. dP dP 88  .dP  88 88d8b.d8b. 88d888b. .d8888b. 88d888b. .d8888b. 88d888b. .d8888b. d8888P dP    dP dP   .dP dP  dP  dP dP.  .dP dP    dP d888888b
- 88'  `88 88'  `88 88'  `"" 88'  `88 88ooood8 88     88'  `88 88'  `88 88 88 88888"   88 88'`88'`88 88'  `88 88'  `88 88'  `88 88'  `88 88'  `88 Y8ooooo.   88   88    88 88   d8' 88  88  88  `8bd8'  88    88    .d8P'
- 88.  .88 88.  .88 88.  ... 88.  .88 88.  ... 88     88.  .88 88    88 88 88 88  `8b. 88 88  88  88 88    88 88.  .88 88.  .88 88.  .88 88             88   88   88.  .88 88 .88'  88.88b.88'  .d88b.  88.  .88  .Y8P
- `88888P8 88Y8888' `88888P' `88888P8 `88888P' dP     `8888P88 dP    dP dP 88 dP   `YP dP dP  dP  dP dP    dP `88888P' 88Y888P' `8888P88 dP       `88888P'   dP   `88888P' 8888P'   8888P Y8P  dP'  `dP `8888P88 d888888P
-                                                          .88             88                                          88             88                                                                     .88
-                                                      d8888P              dP                                          dP             dP                                                                 d8888P
- */
 /**
  *     8888888b.                    888
  *     888   Y88b                   888
@@ -110,8 +101,7 @@ function showNBATeamRoster(players) {
         else if (player.leagues.sacramento != undefined)  playerId = player.leagues.sacramento;
         else                                              playerId = {pos: 'none', jersey: JSON.stringify(player.leagues)};
         html += `<tr>
-			<td>${player.playerId}</td>
-			<td onclick="getNBAPlayerStats(${player.playerId})"><a>${player.firstName} ${player.lastName}<a/></td>
+			<td onclick="getNBAPlayerStats(${player.playerId}, '${player.firstName} ${player.lastName}')"><a>${player.firstName} ${player.lastName}<a/></td>
 			<td>${player.collegeName}</td>
 			<td>${player.dateOfBirth}</td>
 			<td>${playerId.pos}</td>
@@ -154,8 +144,10 @@ function getNBAGameStats(teamId) {
  *      the next step for this app is to put the years each in their own tab
  */
 function showTeamGameStats(games) {
-    for (let year = 2015; year <= 2020; year++ )
-        gamesByYear(games.filter(g => g.seasonYear == year), 'G'+year );
+    for (let year = 2015; year <= 2020; year++ ) {
+        let gamesForTheYear = games.filter(g => g.seasonYear == year);
+        gamesByYear(gamesForTheYear, 'G' + year);
+    }
 }
 
 function gamesByYear(games, tab) {
@@ -163,7 +155,7 @@ function gamesByYear(games, tab) {
     html = ``;
     for (let game of games) {
         html += `<tr>
-		        <td>${game.seasonYear} </td><td>${game.arena} </td><td>${game.city}</td><td>${game.gameDuration} </td>
+		        <td>${game.arena} </td><td>${game.city}</td><td>${game.gameDuration} </td>
 		        <td>${game.hTeam.fullName}</td><td>${game.hTeam.score.points}</td><td  onclick='getGamesAndRoster(${game.hTeam.teamId})'><img src='${game.hTeam.logo}' width=100px height=100px></td>
 		        <td>${game.vTeam.fullName}</td><td>${game.vTeam.score.points}</td><td  onclick='getGamesAndRoster(${game.vTeam.teamId})'><img src='${game.vTeam.logo}' width=100px height=100px></td>
             </tr>`;
@@ -185,7 +177,7 @@ function gamesByYear(games, tab) {
  *                             d8888P
  *
  */
-function getNBAPlayerStats(playerId) {
+function getNBAPlayerStats(playerId, playerName) {
     fetch("https://api-nba-v1.p.rapidapi.com/statistics/players/playerId/" + playerId, {
         "method": "GET",
         "headers": {
@@ -194,7 +186,7 @@ function getNBAPlayerStats(playerId) {
         }
     })
         .then(response => response.json()) //  wait for the response and convert it to JSON
-        .then(playerStats => showNBAPlayerStats(playerStats.api.statistics))
+        .then(playerStats => showNBAPlayerStats(playerStats.api.statistics, playerName))
         .catch(err => console.error(err));
 }
 
@@ -204,9 +196,11 @@ function getNBAPlayerStats(playerId) {
  *      with some additional effort the team they played for and team logo could be displayed
  *      but who wants to do that?
  */
-function showNBAPlayerStats(playerStats) {
-    let palyerStats = document.getElementById('gamesRows');
-    openTab(document.getElementById('gamesBtn'), 'gamesTab')
+function showNBAPlayerStats(playerStats, playerName) {
+    let stats = document.getElementById('playerRows');
+    document.getElementById('player').innerText = `Games Stats for: ${playerName}`;
+
+    openTab(document.getElementById('playerBtn'), 'playerTab')
 
     let html = ``;
     for (let stats of playerStats) {
@@ -215,23 +209,42 @@ function showNBAPlayerStats(playerStats) {
 			<td>${stats.ftm}</td>      <td>${stats.fta}</td>     <td>${stats.ftp}</td>  <td>${stats.tpm}</td>  <td>${stats.tpa}</td>
             <td>${stats.tpp}</td>      <td>${stats.offReb}</td>  <td>${stats.defReb}</td>  <td>${stats.totReb}</td>  <td>${stats.assists}</td>
             <td>${stats.pFouls}</td>   <td>${stats.steals}</td>  <td>${stats.turnovers}</td>  <td>${stats.blocks}</td>  <td>${stats.plusMinus}</td>
-            <td>${stats.playerId}</td>
         </tr>`;
 
     }
-    palyerStats.innerHTML = html;
+    stats.innerHTML = html;
 }
 
-function openTab(target, cityName) {
+/*
+ *                                           dP              dP
+ *                                           88              88
+ * .d8888b.  88d888b.  .d8888b.  88d888b.  d8888d  .d8888b.  88d888b.
+ * 88'  `88  88'  `88  88ooood8  88'  `88    88    88'  `88  88'  `88
+ * 88.  .88  88.  .88  88.  ...  88    88    88    88.  .88  88.  .88
+ * `88888P'  88Y888P'  `88888P'  dP    dP    dP    `88888P8  88Y8888'
+ *           88
+ *           dP
+ *
+ *        Disable all tabContent windows and show the select tab panel
+ *
+ */
+function openTab(target, tabName) {
     var i, tabcontent, tablinks;
+    //  hide all tabcontent divs
     tabcontent = document.getElementsByClassName("tabcontent");
     for (i = 0; i < tabcontent.length; i++) {
         tabcontent[i].style.display = "none";
     }
+
+    //  inactivate (remove the active class) from all tab buttons
     tablinks = document.getElementsByClassName("tablinks");
     for (i = 0; i < tablinks.length; i++) {
         tablinks[i].className = tablinks[i].className.replace(" active", "");
     }
-    document.getElementById(cityName).style.display = "block";
+
+    //  make the desired tab content visible
+    document.getElementById(tabName).style.display = "block";
+
+    //  make the tab button display as the active tab
     target.className += " active";
 }
