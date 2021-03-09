@@ -19,20 +19,6 @@ public class UserController {
     //    our class depends on this service and SpringBoot will inject it into our class
     private UserService userService;
 
-    @RequestMapping("/nba")                                    //  this code will be reached by /users/
-    public String teams(Model model) {
-
-        //  the the userList page will be happy to display it
-        return "nbaTeams";
-    }
-
-    @RequestMapping("/homes")                                    //  this code will be reached by /users/
-    public String homes(Model model) {
-
-        //  the the userList page will be happy to display it
-        return "homes";
-    }
-
     @RequestMapping("/")                                    //  this code will be reached by /users/
     public String index(Model model) {
         //  get a list of all users add to the model and list them
@@ -95,20 +81,4 @@ public class UserController {
         //  go to the list all users page when complete
         return "redirect:/users/";
     }
-
-/*
-    //  using the whatever from the search form get all users by this whatever
-    @RequestMapping(value = "/search", method = RequestMethod.POST)
-    public String searchUser(@RequestParam String Whatever, Model model ){
-        //  SEARCH for all users by Whatever
-        Iterable<User> list = userService.findByWhatever(Whatever);
-
-        //  pass the list of users by Whatever
-        model.addAttribute("Whatever", Whatever);
-        model.addAttribute("users", list);
-
-        //  the the userList page will be happy to display it
-        return "userList";
-    }
-*/
 }
